@@ -1,34 +1,47 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import './App.css'
+/* global AlgoSigner */
+import { useState } from "react";
+import "./App.css";
+import DropdownMenu from "./components/DropdownMenu";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [accounts, setAccounts] = useState();
+  const [isConnected, setIsConnected] = useState(false);
+  const [account, setAccount] = useState();
 
+  const handleMenuClick = (e) => {
+    console.log("click", e.key);
+    setAccount(e.key)
+  };
+
+  const getAccounts = async () => {
+    try {
+      await AlgoSigner.connect();
+      const accounts = await AlgoSigner.accounts({
+        ledger: "TestNet",
+      });
+      setAccounts(accounts);
+      setIsConnected(true);
+    } catch (error) {
+      console.log("error", error);
+    }
+  };
+  const selectAccount = (acc) => {
+    setAccount(acc);
+  };
+
+  console.log("accounts", accounts);
   return (
     <div className="App">
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src="/vite.svg" className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://reactjs.org" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      <h1>Hello There</h1>
+      <button onClick={(_) => getAccounts()}>Connect to Algo wallet</button>
+      {accounts && (
+        <DropdownMenu
+          items={accounts}
+          handleMenuClick={handleMenuClick}
+        />
+      )}
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
